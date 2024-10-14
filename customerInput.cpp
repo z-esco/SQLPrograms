@@ -2,29 +2,37 @@
 #include <string>
 
 //path to sqlite3.h
-#include "genLibs/sqlite3.h"
+//#include "genLibs/sqlite3.h"
 
 bool checkStreamErrors(const std::ostream& out, const std::istream& in);
 bool nameCheck(std::string n);
 bool unitNumCheck(std::string n);
 bool numberCheck(std::string n);
+bool checkBlock(std::string n, std::string blocks[]);
+std::string getNext(std::ifstream read, int ctr, int max);
 
 int main(){
     
+    //constant variable declarations
     const std::string INPUTFILE, DATABASE;
-    const int PARAMETERCOUNT;
+    const int PARAMETERCOUNT = 4; 
+    const int BLOCKCOUNT = 2;
 
+    //create database instance
     sqlite3* db;
 
+    //create datafield char arrays
     char name[25];
     char number[13];
     char unitNum[8];
     char block[20];
 
+    //Const variable definition//
     INPUTFILE = "";
     DATABASE = "postgame.db";
 
-    PARAMETERCOUNT = 4;
+
+    std::string blocks[BLOCKCOUNT] = {"vox", "uclub"};
 
     //opens stream to file
     std::ifstream read;
@@ -39,11 +47,12 @@ int main(){
         return 1;
     }
 
+    //heart of program, runs line by line to send individual sqlite statements adding a new entry to a table every time
     while(!read.eof()){
         int rc;
         for(int i = 0 ; i< PARAMETERCOUNT; i++){
             std::string str;
-            str = getNext(std::cin, i%PARAMETERCOUNT, PARAMETERCOUNT) 
+            str = getNext(std::cin, i%PARAMETERCOUNT, PARAMETERCOUNT); 
 
             switch(i){
                 case 0:
@@ -58,6 +67,10 @@ int main(){
                 case 3:
                     strcpy(block, str.c_str());
                     break;
+                default:
+                    return 1;
+                    break;
+                
             }
         }
         
@@ -93,35 +106,6 @@ int main(){
 
     //closes database
     sqlite3_close(db);
-
-    PARAMETERCOUNT = 4;
-    std::string inputs[PARAMETERCOUNT];
-    for(int i = 0; i < PARAMETERCOUNT; i++){
-        switch(i){
-            case 1:
-                str = getNext(std::cin, i%PARAMETERCOUNT, PARAMETERCOUNT) 
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-        }
-    }
-    name = getNext(std::cin. nameCheck())
-    
-
-    /*std::cout << "Input unitNum: ";
-    std::cin >> unitNum;
-    }while(!checked)
-    std::cout << "Input block: ";
-    std::cin >> block;
-
-
-    std::cout << "Input phone number: ";
-    std::cin >> number;*/
-
 
 return 0;
 }
@@ -161,6 +145,12 @@ bool nameCheck(std::string n){
             valid = false;
         }
 
+        if(n.size() > 25){
+            std::cout << "The name must be less than 25 characters\n";
+            valid = false;
+        }
+
+
     return valid;
 }
 
@@ -193,22 +183,23 @@ bool numberCheck(std::string n){
             valid = true;
         }
     }
-
-    bool internationalNum = false;
-    if(!valid && n[n.size()-10-1] == ' '){
-        internationalNum = true;
-        for(int i = 0; i < n.size(); i ++){
-            if(i == n.size() -10 -1)
-                i++;
-            if(!isdigit(n[i])){
-                std::cout << "Improper international format (## ##########)\n";
-                internationalNum = false;
-            }
-        }
-        valid = internationalNum;
-    }
     
     return valid;
+}
+
+bool checkBlock(std::string n, std::string blocks[]){
+    bool valid = false;
+
+    for(int i = 0; i < blocks.size(); i++){
+        if(n == blocks[i])
+            valid = true;
+    }
+
+    if(!valid)
+        "Block is invalid: Doesn't match the list\n";
+    
+    return valid;
+
 }
 
 std::string getNext(std::ifstream read, int ctr, int max){
@@ -218,19 +209,21 @@ std::string getNext(std::ifstream read, int ctr, int max){
     read >> str;
 
     switch(ctr){
-            case 0:
-                valid = (nameCheck(str) && checkStreamErrors(read, std::out)); 
-                break;
-            case 1:
-                valid = (numberCheck(str) && checkStreamErrors(read, std::out)); 
-                break;
-            case 2:
-                valid = (unitNumCheck(str) && checkStreamErrors(read, std::out)); v
-                break;
-            case 3:
-                valid = (checkBlock(str) && checkStreamErrors(read, std::out)); 
-                break;
-        }
+        case 0:
+            valid = (nameCheck(str) && checkStreamErrors(read, std::out)); 
+            break;
+        case 1:
+            valid = (numberCheck(str) && checkStreamErrors(read, std::out)); 
+            break;
+        case 2:
+            valid = (unitNumCheck(str) && checkStreamErrors(read, std::out));
+            break;
+        case 3:
+            valid = (checkBlock(str) && checkStreamErrors(read, std::out)); 
+            break;
+        default:
+            str = "ERROR";
+    }
     if(!valid)
         str = "ERROR";
 
