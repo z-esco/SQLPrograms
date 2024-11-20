@@ -1,3 +1,13 @@
+//This is a comprehensive SQLdata entry program that reads a txt file and input its contents to a mysql database
+//Here the database must have 4 columns:
+                            // name, unitNunmber, block, phoneNumber
+//The file must contain lines structured as the following :
+                            //name unitNumber phioneNumber block
+//This is a way to quickly input multiple entries at the same time without having to wirte a ton of queries
+//In my use case, I was inputting the name phone number and street address (unit number, block)
+//This would be used for customer information records
+
+
 #include <iostream>
 #include <string>
 
